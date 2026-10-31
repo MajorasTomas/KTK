@@ -30,7 +30,7 @@ void Initialization::inputA() {
         cout<<"Jei norite patys ivesti standartinio pavidalo generuojancios matricos narius, spauskite 1. Jei norite ja sugeneruoti automatiskai spauskite bet koki kita simboli: ";
         cin>>check;
         if(check == "1") {
-            cout<<"Iveskite standartinio pavidalo generuojancios matricos " << k << " eiluciu, likusiu " << n-k << " stulpeliu narius (kadangi q=2, bus imamos ivestu skaiciu mod 2 reiksmes)" << endl;
+            cout<<"Iveskite standartinio pavidalo generuojancios matricos " << k << " eiluciu, likusiu " << n-k << " stulpeliu narius (bus imamos ivestu skaiciu mod q reiksmes)" << endl;
             for(int i=0; i<k; i++) {
                 vector<int> row;
                 for(int j=k; j<n; j++) {
@@ -76,7 +76,17 @@ void Initialization::printLinearCodeInitializationStatus(LinearCode& linearCode)
         }
         cout<<endl;
     }
+
+    cout<<"Jusu (" << n - k << ", " << n << ") kontroline matrica: "<<endl;
+     
+    for(int i=0; i<n-k; i++) {
+        for(int j=0; j<n; j++) {
+            cout << linearCode.getControlMatrixEntry(i, j) << " ";
+        }
+        cout<<endl;
+    }
 }
+
 void Initialization::printChannelInitializationStatus(Channel& channel) {
     cout<<"Tikimybe, jog is jusu kanalo iseis klaidingas simbolis yra: "<< ep <<endl;
 }
@@ -86,13 +96,11 @@ LinearCode Initialization::initializeLinearCode() {
     inputN();
     inputA();
     LinearCode linearCode(k, n, q, A);
-    printLinearCodeInitializationStatus(linearCode);
     return linearCode;
 }
 
 Channel Initialization::initializeChannel() {
     inputEp();
     Channel channel(ep);
-    printChannelInitializationStatus(channel);
     return channel;
 }
