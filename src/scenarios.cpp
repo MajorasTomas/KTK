@@ -1,5 +1,6 @@
 #include "../include/scenarios.h"
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -33,6 +34,87 @@ vector<int> findMistakesIndexes(const vector<int>& encodedVector, const vector<i
         }  
     }
     return result;
+}
+
+vector<int> textToBits(const string& text) {
+    vector<int> bits;
+    for(char c : text) {
+        for(int i=7; i>=0; i--) {
+            bits.push_back((c >> i) & 1);
+        }
+    }
+    return bits;
+}
+
+string bitsToText(const vector<int>& bits) {
+    string text;
+    for(int i=0; i<bits.size(); i+=8) {
+        int byte = 0;
+        for(int j=0; j<8; j++) {
+            byte = byte * 2 + bits[i+j];
+        }
+        text += (char)byte;
+    }
+    return text;
+}
+
+vector<vector<int>> splitIntoPieces(const vector<int>& bits, int pieceLength) {
+    vector<vector<int>> output;
+    int artificalEndingBitsCount = (pieceLength - bits.size() % pieceLength) % pieceLength;
+    vector<int> divisbleVector = bits;
+    for(int i=0; i<artificalEndingBitsCount; i++) {
+        divisbleVector.push_back(0);
+    }
+    int parts = divisbleVector.size() / pieceLength;
+    for(int i=0; i<parts; i++) {
+        vector<int> piece;
+        for(int j=0; j<pieceLength; j++) {
+            piece.push_back(divisbleVector[i*pieceLength + j]);
+        }
+        output.push_back(piece);
+    }
+    return output;
+}
+
+vector<int> joinPieces(const vector<vector<int>>& pieces, int originalLength) {
+    vector<int> output;
+    for(int i=0; i<pieces.size(); i++) {
+        for(int j=0; j<pieces[i].size(); j++) {
+            output.push_back(pieces[i][j]);
+            if(output.size() == originalLength) break;
+        }
+    }
+    return output;
+}
+
+std::vector<int> Scenarios::sendBitsWithoutCode(const std::vector<int>& bits) {
+    vector<vector<int>> pieces = splitIntoPieces(bits, linearCode.getK());
+    vector<vector<int>> sentPieces;
+    for(const auto& piece : pieces) {
+        sentPieces.push_back(channel.sendCode(piece));
+    }
+    return joinPieces(sentPieces, bits.size());
+}
+
+std::vector<int> Scenarios::sendBitsWithCode(const std::vector<int>& bits) {
+    vector<vector<int>> pieces = splitIntoPieces(bits, linearCode.getK());
+    vector<vector<int>> encodedPieces;
+    for(const auto& piece : pieces) {
+        encodedPieces.push_back(linearCode.encodeVector(piece));
+    }
+    vector<vector<int>> sentPieces;
+    for(const auto& encodedPiece : encodedPieces) {
+        sentPieces.push_back(channel.sendCode(encodedPiece));
+    }
+    vector<vector<int>> decodedPieces;
+    for(const auto& sentPiece : sentPieces) {
+        decodedPieces.push_back(linearCode.decodeVector(sentPiece));
+    }
+    vector<vector<int>> decodedMessages;
+    for(const auto& decodedPiece : decodedPieces) {
+        decodedMessages.push_back(linearCode.decodeVectorToMessage(decodedPiece));
+    }
+    return joinPieces(decodedMessages, bits.size());
 }
 
 bool checkIsVectorTextCorrectFormat(const string& text, int length) {
@@ -87,13 +169,31 @@ void Scenarios::runVectorScenario() {
         string decodedVectorText = vectorToString(decodedVector);
         cout<<"Dekoduotas vektorius: "<<decodedVectorText<<endl;
 
-        string decodedMessageText = decodedVectorText.substr(0, linearCode.getK());
+        vector<int> decodedMessage = linearCode.decodeVectorToMessage(decodedVector);
+        string decodedMessageText = vectorToString(decodedMessage);
         cout<<"Dekoduotas pranesimas: "<<decodedMessageText<<endl;
         break;
     }    
 }
 
-void Scenarios::runTextScenario() {}
+void Scenarios::runTextScenario() {
+    string text;
+    cout<<"Iveskite teksta: ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, text);
+    cout<<endl;
+    vector<int> textBits = textToBits(text);
+    cout<<"Rezultatas, siunciant kanalu nekoduojant: ";
+    vector<int> bitsWithoutCode = sendBitsWithoutCode(textBits);
+    string textWithoutCode = bitsToText(bitsWithoutCode);
+    cout<<textWithoutCode;
+    cout<<endl;
+    cout<<"Rezultatas, siunciant kanalu koduojant: ";
+    vector<int> bitsWithCode = sendBitsWithCode(textBits);
+    string textWithCode = bitsToText(bitsWithCode);
+    cout<<textWithCode;
+    cout<<endl;
+}
 
 void Scenarios::runImageScenario() {}
 

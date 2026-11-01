@@ -88,6 +88,11 @@ vector<int> LinearCode::decodeVector(const vector<int>& V) {
     return decodedVector;
 }
 
+std::vector<int> LinearCode::decodeVectorToMessage(std::vector<int> V) {
+    V.resize(k);
+    return V;
+}
+
 void LinearCode::recursionWeightN(vector<int> A, int weight, int remaining, int start) {
     if(remaining == 0) {
         vector<int> result = calculateSyndrome(A);

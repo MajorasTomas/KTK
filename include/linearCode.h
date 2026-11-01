@@ -24,4 +24,5 @@ class LinearCode {
         std::vector<int> encodeVector(const std::vector<int>& V);
         std::vector<int> calculateSyndrome(const std::vector<int>& V);
         std::vector<int> decodeVector(const std::vector<int>& V);
+        std::vector<int> decodeVectorToMessage(std::vector<int> V);
 };
