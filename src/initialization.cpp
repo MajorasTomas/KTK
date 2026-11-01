@@ -30,7 +30,7 @@ void Initialization::inputA() {
         cout<<"Jei norite patys ivesti standartinio pavidalo generuojancios matricos narius, spauskite 1. Jei norite ja sugeneruoti automatiskai spauskite bet koki kita simboli: ";
         cin>>check;
         if(check == "1") {
-            cout<<"Iveskite standartinio pavidalo generuojancios matricos " << k << " eiluciu, likusiu " << n-k << " stulpeliu narius (bus imamos ivestu skaiciu mod q reiksmes)" << endl;
+            cout<<"Iveskite standartinio pavidalo generuojancios matricos " << k << " eiluciu, likusiu " << n-k << " stulpeliu narius (bus imamos ivestu skaiciu mod 2 reiksmes)" << endl;
             for(int i=0; i<k; i++) {
                 vector<int> row;
                 for(int j=k; j<n; j++) {
@@ -38,7 +38,7 @@ void Initialization::inputA() {
                     cout<<"Iveskite " << i+1 << "-osios eilutes " << j+1 << "-aji nari: ";
                     cin>>val;
                     cout<<endl;
-                    val = ((val % q) + q) % q;
+                    val = abs(val % q);
                     row.push_back(val);
                 }
                 A.push_back(row);
@@ -68,16 +68,16 @@ void Initialization::inputEp() {
 }
 
 void Initialization::printLinearCodeInitializationStatus(LinearCode& linearCode) {
-    cout<<"Jusu (" << k << ", " << n << ") generuojanti standartinio pavidalo matrica: "<<endl;
+    cout<<"Jusu (" << linearCode.getK() << ", " << linearCode.getN() << ") generuojanti standartinio pavidalo matrica: "<<endl;
 
-    for(int i=0; i<k; i++) {
-        for(int j=0; j<n; j++) {
+    for(int i=0; i<linearCode.getK(); i++) {
+        for(int j=0; j<linearCode.getN(); j++) {
             cout << linearCode.getGenerationMatrixEntry(i, j) << " ";
         }
         cout<<endl;
     }
 
-    cout<<"Jusu (" << n - k << ", " << n << ") kontroline matrica: "<<endl;
+    cout<<"Jusu (" << linearCode.getN() - linearCode.getK() << ", " << linearCode.getN() << ") kontroline matrica: "<<endl;
      
     for(int i=0; i<n-k; i++) {
         for(int j=0; j<n; j++) {
@@ -85,10 +85,22 @@ void Initialization::printLinearCodeInitializationStatus(LinearCode& linearCode)
         }
         cout<<endl;
     }
+
+    cout<<"Jusu (lyderio, sindromo) lentele: " << endl;
+    for(const auto& [syndrome, leader] : linearCode.getSyndromeTable()) {
+        for(auto symbol : leader) {
+            cout<<symbol;
+        }
+        cout<<", ";
+        for(auto symbol : syndrome) {
+            cout<<symbol;
+        }
+        cout<<endl;
+    }
 }
 
 void Initialization::printChannelInitializationStatus(Channel& channel) {
-    cout<<"Tikimybe, jog is jusu kanalo iseis klaidingas simbolis yra: "<< ep <<endl;
+    cout<<"Tikimybe, jog is jusu kanalo iseis klaidingas simbolis yra: "<< channel.getEp() <<endl;
 }
 
 LinearCode Initialization::initializeLinearCode() {

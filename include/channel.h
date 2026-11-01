@@ -6,4 +6,5 @@ class Channel {
 
     public:
         Channel(double ep);
+        double getEp();
 };
