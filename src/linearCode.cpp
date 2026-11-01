@@ -44,7 +44,7 @@ void LinearCode::createControlMatrix() {
     }
 }
 
-vector<int> LinearCode::multiplyControlMatrixByVector(const vector<int>& V) {
+vector<int> LinearCode::calculateSyndrome(const vector<int>& V) {
     vector<int> output;
     for(int i=0; i<n-k; i++) {
         int sum = 0;
@@ -56,7 +56,7 @@ vector<int> LinearCode::multiplyControlMatrixByVector(const vector<int>& V) {
     return output;
 }
 
-vector<int> LinearCode::multiplyVectorByGenerationMatrix(const vector<int>& V) {
+vector<int> LinearCode::encodeVector(const vector<int>& V) {
     vector<int> output;
     for(int i=0; i<n; i++) {
         int sum = 0;
@@ -68,11 +68,31 @@ vector<int> LinearCode::multiplyVectorByGenerationMatrix(const vector<int>& V) {
     return output;
 }
 
-void LinearCode::recursionWeightN(vector<int> A, int remaining, int start) {
+vector<int> LinearCode::decodeVector(const vector<int>& V) {  
+    vector<int> decodedVector = V;
+    vector<int> syndrome = calculateSyndrome(decodedVector);
+    int weight = syndromeTable[syndrome];
+    while(weight > 0) {
+        for(int i=0; i<n; i++) {
+            vector<int> tempDecodedVector = decodedVector;
+            tempDecodedVector[i] = (tempDecodedVector[i] + 1) % 2;
+            vector<int> tempSyndrome = calculateSyndrome(tempDecodedVector);
+            int tempWeight = syndromeTable[tempSyndrome];
+            if(weight > tempWeight) {
+                decodedVector = tempDecodedVector;
+                weight = tempWeight;
+                break;
+            }
+        }
+    } 
+    return decodedVector;
+}
+
+void LinearCode::recursionWeightN(vector<int> A, int weight, int remaining, int start) {
     if(remaining == 0) {
-        vector<int> result = multiplyControlMatrixByVector(A);
+        vector<int> result = calculateSyndrome(A);
         if(syndromeTable.count(result) == 0) {
-            syndromeTable[result] = A;
+            syndromeTable[result] = weight;
         }
         return;
     }
@@ -80,7 +100,7 @@ void LinearCode::recursionWeightN(vector<int> A, int remaining, int start) {
         if(syndromeTable.size() == syndromeCount) break;
         vector<int> B = A;
         B[i] = 1;
-        recursionWeightN(B, remaining-1, i+1);
+        recursionWeightN(B, weight, remaining-1, i+1);
     }
 }
 
@@ -92,7 +112,7 @@ void LinearCode::createSyndromeTable() {
 
     for(int i=0; i<=n; i++) {
         vector<int> leaderContestant(n, 0);
-        recursionWeightN(leaderContestant, i, 0);
+        recursionWeightN(leaderContestant, i, i, 0);
         if(syndromeTable.size() == syndromeCount) break;
     }
 }
@@ -117,6 +137,6 @@ int LinearCode::getSyndromeCount() {
     return syndromeCount;
 }
 
-const map<vector<int>, vector<int>>& LinearCode::getSyndromeTable() {
+const map<vector<int>, int>& LinearCode::getSyndromeTable() {
     return syndromeTable;
 }

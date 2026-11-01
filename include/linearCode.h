@@ -7,8 +7,8 @@ class LinearCode {
         int k, n, q, syndromeCount;
         std::vector<std::vector<int>> G;
         std::vector<std::vector<int>> H;
-        std::map<std::vector<int>, std::vector<int>> syndromeTable;
-        void recursionWeightN(std::vector<int> A, int remaining, int start);
+        std::map<std::vector<int>, int> syndromeTable;
+        void recursionWeightN(std::vector<int> A, int weight, int remaining, int start);
         void createGenerationMatrix(std::vector<std::vector<int>> A);
         void createControlMatrix();
         void createSyndromeTable();
@@ -20,7 +20,8 @@ class LinearCode {
         int getN();
         int getK();
         int getSyndromeCount();
-        const std::map<std::vector<int>, std::vector<int>>& getSyndromeTable();
-        std::vector<int> multiplyVectorByGenerationMatrix(const std::vector<int>& V);
-        std::vector<int> multiplyControlMatrixByVector(const std::vector<int>& V);
+        const std::map<std::vector<int>, int>& getSyndromeTable();
+        std::vector<int> encodeVector(const std::vector<int>& V);
+        std::vector<int> calculateSyndrome(const std::vector<int>& V);
+        std::vector<int> decodeVector(const std::vector<int>& V);
 };

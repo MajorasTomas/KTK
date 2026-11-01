@@ -86,15 +86,13 @@ void Initialization::printLinearCodeInitializationStatus(LinearCode& linearCode)
         cout<<endl;
     }
 
-    cout<<"Jusu (lyderio, sindromo) lentele: " << endl;
-    for(const auto& [syndrome, leader] : linearCode.getSyndromeTable()) {
-        for(auto symbol : leader) {
-            cout<<symbol;
-        }
-        cout<<", ";
+    cout<<"Jusu kodo (sindromas, svoris) lentele: " << endl;
+    for(const auto& [syndrome, weight] : linearCode.getSyndromeTable()) {
         for(auto symbol : syndrome) {
             cout<<symbol;
         }
+        cout<<", ";
+        cout<<weight;
         cout<<endl;
     }
 }
