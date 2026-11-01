@@ -1,4 +1,5 @@
 #include "../include/initialization.h"
+#include "../include/scenarios.h"
 
 int main() {
     Initialization initialization;
@@ -7,4 +8,7 @@ int main() {
 
     initialization.printLinearCodeInitializationStatus(linearCode);
     initialization.printChannelInitializationStatus(channel);
+
+    Scenarios scenarios(linearCode, channel);
+    scenarios.runScenarios();
 }

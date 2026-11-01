@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include<map>
+#include <map>
 
 class LinearCode {
     private:
