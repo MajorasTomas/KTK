@@ -44,12 +44,24 @@ void LinearCode::createControlMatrix() {
     }
 }
 
-vector<int> LinearCode::multiplyMatrixByVector(const vector<vector<int>>& M, const vector<int>& V) {
+vector<int> LinearCode::multiplyControlMatrixByVector(const vector<int>& V) {
     vector<int> output;
-    for(int i=0; i<M.size(); i++) {
+    for(int i=0; i<n-k; i++) {
         int sum = 0;
-        for(int j=0; j<M[i].size(); j++) {
-            sum += M[i][j] * V[j];
+        for(int j=0; j<n; j++) {
+            sum += H[i][j] * V[j];
+        }
+        output.push_back(sum % 2);
+    }
+    return output;
+}
+
+vector<int> LinearCode::multiplyVectorByGenerationMatrix(const vector<int>& V) {
+    vector<int> output;
+    for(int i=0; i<n; i++) {
+        int sum = 0;
+        for(int j=0; j<k; j++) {
+            sum += V[j] * G[j][i];
         }
         output.push_back(sum % 2);
     }
@@ -58,7 +70,7 @@ vector<int> LinearCode::multiplyMatrixByVector(const vector<vector<int>>& M, con
 
 void LinearCode::recursionWeightN(vector<int> A, int remaining, int start) {
     if(remaining == 0) {
-        vector<int> result = multiplyMatrixByVector(H, A);
+        vector<int> result = multiplyControlMatrixByVector(A);
         if(syndromeTable.count(result) == 0) {
             syndromeTable[result] = A;
         }
